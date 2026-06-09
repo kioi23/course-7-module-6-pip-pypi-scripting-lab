@@ -16,4 +16,61 @@ def generate_log(data):
 
     # STEP 4: Print a confirmation message with the filename
 
-    pass
+    
+
+    if not isinstance(data, list):
+        raise ValueError("Input data must be a list")
+    
+    
+    filename = f"log_{datetime.now().strftime('%Y%m%d')}.txt"
+    
+
+    try:
+        with open(filename, "w") as file:
+            for entry in data:
+                file.write(f"{entry}\n")
+    except IOError as e:
+        print(f"Error writing to file: {e}")
+        raise
+    
+    
+    print(f"Log written to {filename}")
+    return filename
+
+
+def fetch_data():
+    """Fetch data from a public API using requests."""
+    try:
+        import requests
+        response = requests.get("https://jsonplaceholder.typicode.com/posts/1")
+        if response.status_code == 200:
+            return response.json()
+        else:
+            print(f"Error: API returned status code {response.status_code}")
+            return {}
+    except ImportError:
+        print("Error: requests library not installed. Install with: pip install requests")
+        return {}
+    except requests.RequestException as e:
+        print(f"Error fetching data: {e}")
+        return {}
+
+
+if __name__ == "__main__":
+    
+    log_data = [
+        "User logged in",
+        "User updated profile",
+        "Report exported"
+    ]
+    
+    
+    log_file = generate_log(log_data)
+    print(f"Created: {log_file}")
+    
+    
+    print("\nFetching data from API...")
+    post = fetch_data()
+    if post:
+        print("Fetched Post Title:", post.get("title", "No title found"))
+        print("Post ID:", post.get("id", "No ID found"))
